@@ -1,0 +1,73 @@
+#VRML_SIM R2020a utf8
+WorldInfo {
+  basicTimeStep 16
+}
+Viewpoint {
+  orientation 0.9895563742244685 -0.13314038996925712 -0.05524326918781678 5.620184856382656
+  position -0.25895437311384345 3.609386343311534 4.08359800575347
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+WoodenBox {
+  translation 0 0.05 -0.47
+  size 0.1 0.1 0.1
+}
+WoodenBox {
+  translation 0.37 0.05 0
+  name "wooden box(1)"
+  size 0.1 0.1 0.1
+}
+WoodenBox {
+  translation 0 0.05 0.49
+  name "wooden box(2)"
+  size 0.1 0.1 0.1
+  mass 0.2
+}
+E-puck {
+  translation 0.3 0 0.31
+  controller "front_command"
+}
+Floor {
+  size 2 2
+}
+Solid {
+  translation 0 0.42 0
+  children [
+    DEF ball Shape {
+      appearance PBRAppearance {
+        baseColor 0 1 0
+        roughness 1
+        metalness 0
+      }
+      geometry Sphere {
+        radius 0.12
+        subdivision 2
+      }
+    }
+  ]
+  boundingObject USE ball
+  physics Physics {
+  }
+}
+Solid {
+  translation -0.55 0.42 0
+  children [
+    DEF ball Shape {
+      appearance PBRAppearance {
+        baseColor 0 1 0
+        roughness 1
+        metalness 0
+      }
+      geometry Sphere {
+        radius 0.12
+        subdivision 2
+      }
+    }
+  ]
+  name "solid(1)"
+  boundingObject USE ball
+  physics Physics {
+  }
+}
