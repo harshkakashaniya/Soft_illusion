@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+
+<robot name="F16" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <link name="Centre">
+    <inertial>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <mass value="50.0"/>
+    </inertial>
+    <visual>
+         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>  
+          <mesh filename="f16_falcon.stl" scale= "0.1 0.1 0.1"/>
+        </geometry>
+            <color rgba="1.0 0.0 0.0 0.8"/>
+    </visual>
+  </link>
+
+</robot>
+
