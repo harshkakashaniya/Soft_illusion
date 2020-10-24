@@ -1,0 +1,11 @@
+Webots Proto Cache File version 1.5
+protoFileHash: b9fa0d558ff9e79a33c9dd20cbe9a332
+needsRobotAncestor: 1
+baseType: Solid
+slotType: 
+parameters: translation,rotation,name,numberOfRays
+tags: 
+license:  Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+licenseUrl:  https://cyberbotics.com/webots_assets_license
+documentationUrl: 
+info: Distance\ssensor\sof\sthe\se-puck\smobile\srobot.\n
