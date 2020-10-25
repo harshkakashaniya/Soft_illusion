@@ -1,96 +1,66 @@
-# Copyright 1996-2019 Cyberbotics Ltd.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""ROS2 example controller."""
-
-from webots_ros2_core.webots_node import WebotsNode
-from webots_ros2_msgs.srv import SetDifferentialWheelSpeed
-
 import rclpy
-
+import sys
 from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist
-
-import sys
-import rclpy
 from rclpy.node import Node
-from webots_ros2_msgs.srv import SetDifferentialWheelSpeed
-from math import pi
-from rclpy.time import Time
-from tf2_ros import StaticTransformBroadcaster
-from webots_ros2_core.math_utils import interpolate_lookup_table
-from webots_ros2_core.webots_node import WebotsNode
-from std_msgs.msg import Float64
+import time
 
-class ExampleController(Node):
+class LineFollower(Node):
+    def __init__ (self):
+        super().__init__('linefollower_cmdvel')
+        self.subs_right_ir = self.create_subscription(Float64,'right_IR',self.rightIR_cb,1)
+        self.subs_left_ir = self.create_subscription(Float64,'left_IR',self.leftIR_cb,1)
+        self.subs_mid_ir = self.create_subscription(Float64,'mid_IR',self.midIR_cb,1)
+        self.pubs_cmdvel= self.create_publisher(Twist, 'cmd_vel',1)
+        self.speed=0.1
+        self.angle_diff=0.005
+        self.GS_RIGHT=0
+        self.GS_LEFT=0
+        self.GS_MID=0
+        self.DeltaS=0
+        self.cmd=Twist()
+        self.stop=False
+        self.count=0
+        self.count_threshold=10
 
-    def __init__(self):
-        super().__init__('control_de_robot')
-        # self.sensorTimer = self.create_timer(0.001 * self.timestep,
-        #                                      self.sensor_callback)
-        # self.leftMotor = self.robot.getMotor('motor.left')
-        # self.rightMotor = self.robot.getMotor('motor.right')
-        # self.leftMotor.setPosition(float('inf'))
-        # self.rightMotor.setPosition(float('inf'))
-        # self.leftMotor.setVelocity(0)
-        # self.rightMotor.setVelocity(0)
-        # self.motorMaxSpeed = self.leftMotor.getMaxVelocity()
-        # self.motorService = self.create_service(SetDifferentialWheelSpeed,
-        #                                         'motor', self.motor_callback)
-        # self.sensorPublisher = self.create_publisher(Float64, 'sensor', 10)
-        # # front central proximity sensor
-        # self.frontSensor = self.robot.getDistanceSensor('prox.horizontal.2')
-        # self.frontSensor.enable(self.timestep)
-        # self.cmdVelSubscriber = self.create_subscription(Twist, 'cmd_vel',
-                                                        #  self.cmdVel_callback,
-                                                        #  10)
-        self.get_logger().info('Controller enabled')
+    def LineFollowingModule(self):
+        self.DeltaS = self.GS_RIGHT - self.GS_LEFT
+        self.cmd.linear.x=self.speed
+        self.cmd.angular.z=self.angle_diff*self.DeltaS
 
-    # def sensor_callback(self):
-    #     # Publish distance sensor value
-    #     msg = Float64()
-    #     msg.data = self.frontSensor.getValue()
-    #     self.sensorPublisher.publish(msg)
+        if self.GS_RIGHT>500 and self.GS_LEFT>500 and self.GS_MID>500 :
+            self.count+=1
+        else:
+            self.count=0
 
-    # def motor_callback(self, request, response):
-    #     self.leftMotor.setVelocity(request.left_speed)
-    #     self.rightMotor.setVelocity(request.right_speed)
-    #     return response
+        if self.count>self.count_threshold:
+            self.stop=True
 
-    # def cmdVel_callback(self, msg):
-    #     wheelGap = 0.1  # in meter
-    #     wheelRadius = 0.021  # in meter
-    #     leftSpeed = ((2.0 * msg.linear.x - msg.angular.z * wheelGap) /
-    #                  (2.0 * wheelRadius))
-    #     rightSpeed = ((2.0 * msg.linear.x + msg.angular.z * wheelGap) /
-    #                   (2.0 * wheelRadius))
-    #     leftSpeed = min(self.motorMaxSpeed, max(-self.motorMaxSpeed,
-    #                                             leftSpeed))
-    #     rightSpeed = min(self.motorMaxSpeed, max(-self.motorMaxSpeed,
-    #                                              rightSpeed))
-    #     self.leftMotor.setVelocity(leftSpeed)
-    #     self.rightMotor.setVelocity(rightSpeed)
+        if self.stop:
+            self.cmd.linear.x = 0.0
+            self.cmd.angular.z= 0.0
+               
+        self.pubs_cmdvel.publish(self.cmd)
+        self.stop=False
 
+    def rightIR_cb(self,msg):
+        self.GS_RIGHT=msg.data
+        self.LineFollowingModule()
+
+    def leftIR_cb(self,msg):
+        self.GS_LEFT=msg.data
+    
+    def midIR_cb(self,msg):
+        self.GS_MID=msg.data
 
 def main(args=None):
+
     rclpy.init(args=args)
 
-    exampleController = ExampleController()
-
-    rclpy.spin(exampleController)
+    ls=LineFollower()
+    rclpy.spin(ls)
+    ls.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

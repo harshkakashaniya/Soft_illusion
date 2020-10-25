@@ -1,12 +1,7 @@
 import sys
 import rclpy
 from rclpy.node import Node
-from webots_ros2_msgs.srv import SetDifferentialWheelSpeed
-from math import pi
-import rclpy
 from rclpy.time import Time
-from tf2_ros import StaticTransformBroadcaster
-from webots_ros2_core.math_utils import interpolate_lookup_table
 from webots_ros2_core.webots_node import WebotsNode
 from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist
@@ -18,6 +13,8 @@ class service_node_vel(WebotsNode):
         #Sensor section
         self.sensorTimer = self.create_timer(0.001 * self.timestep,
                                              self.sensor_callback)
+
+        # Enable 3 sensors
         self.timestep=16
         self.right_sensor = self.robot.getDistanceSensor('ls_right')
         self.right_sensor.enable(self.timestep)
@@ -26,14 +23,15 @@ class service_node_vel(WebotsNode):
         self.left_sensor = self.robot.getDistanceSensor('ls_left')
         self.left_sensor.enable(self.timestep)
 
-        self.sensorPublisher_right = self.create_publisher(Float64, 'right_IR', 10)
-        self.sensorPublisher_mid = self.create_publisher(Float64, 'mid_IR', 10)
-        self.sensorPublisher_left = self.create_publisher(Float64, 'left_IR', 10)
+        self.sensorPublisher_right = self.create_publisher(Float64, 'right_IR', 1)
+        self.sensorPublisher_mid = self.create_publisher(Float64, 'mid_IR', 1)
+        self.sensorPublisher_left = self.create_publisher(Float64, 'left_IR', 1)
         self.get_logger().info('Sensor enabled')
 
         # Wheels section
         # |1 2|
         # |3 4|
+        # Front wheels
         self.leftMotor_front = self.robot.getMotor('wheel1')
         self.rightMotor_front = self.robot.getMotor('wheel2')
         self.leftMotor_front.setPosition(float('inf'))
@@ -41,7 +39,7 @@ class service_node_vel(WebotsNode):
         self.leftMotor_front.setVelocity(0)
         self.rightMotor_front.setVelocity(0)
 
-        ####
+        # Rear wheels
         self.leftMotor_rear = self.robot.getMotor('wheel3')
         self.rightMotor_rear = self.robot.getMotor('wheel4')
         self.leftMotor_rear.setPosition(float('inf'))
@@ -50,22 +48,17 @@ class service_node_vel(WebotsNode):
         self.rightMotor_rear.setVelocity(0)
 
         self.motorMaxSpeed = self.leftMotor_rear.getMaxVelocity()
-
-        self.cmdVelSubscriber = self.create_subscription(Twist, 'cmd_vel',
-                                                         self.cmdVel_callback,
-                                                         10)
+        
+        # Create Subscriber
+        self.cmdVelSubscriber = self.create_subscription(Twist, 'cmd_vel',self.cmdVel_callback,1)
 
     def cmdVel_callback(self, msg):
         wheelGap = 0.1  # in meter
         wheelRadius = 0.04  # in meter
-        leftSpeed = ((2.0 * msg.linear.x - msg.angular.z * wheelGap) /
-                    (2.0 * wheelRadius))
-        rightSpeed = ((2.0 * msg.linear.x + msg.angular.z * wheelGap) /
-                    (2.0 * wheelRadius))
-        leftSpeed = min(self.motorMaxSpeed, max(-self.motorMaxSpeed,
-                                                leftSpeed))
-        rightSpeed = min(self.motorMaxSpeed, max(-self.motorMaxSpeed,
-                                                rightSpeed))
+        leftSpeed = ((2.0 * msg.linear.x - msg.angular.z * wheelGap) / (2.0 * wheelRadius))
+        rightSpeed = ((2.0 * msg.linear.x + msg.angular.z * wheelGap) /(2.0 * wheelRadius))
+        leftSpeed = min(self.motorMaxSpeed, max(-self.motorMaxSpeed,leftSpeed))
+        rightSpeed = min(self.motorMaxSpeed, max(-self.motorMaxSpeed,rightSpeed))
         self.leftMotor_front.setVelocity(leftSpeed)
         self.rightMotor_front.setVelocity(rightSpeed)
         self.leftMotor_rear.setVelocity(leftSpeed)
@@ -88,10 +81,10 @@ class service_node_vel(WebotsNode):
 def main(args=None):
     rclpy.init(args=args)
     client_vel = service_node_vel(args=args)
-
-    while rclpy.ok():
-        rclpy.spin_once(client_vel)
-
+    rclpy.spin(client_vel)
+    
+    # while rclpy.ok():
+        # rclpy.spin_once(client_vel)
     
     client_vel.destroy_node()
     rclpy.shutdown()
