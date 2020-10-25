@@ -9,12 +9,13 @@ from tf2_ros import StaticTransformBroadcaster
 from webots_ros2_core.math_utils import interpolate_lookup_table
 from webots_ros2_core.webots_node import WebotsNode
 from std_msgs.msg import Float64
+from geometry_msgs.msg import Twist
 
 class service_node_vel(WebotsNode):
 
     def __init__(self,args):
         super().__init__('sensor_enable_node',args)
-
+        #Sensor section
         self.sensorTimer = self.create_timer(0.001 * self.timestep,
                                              self.sensor_callback)
         self.timestep=16
@@ -24,13 +25,51 @@ class service_node_vel(WebotsNode):
         self.mid_sensor.enable(self.timestep)
         self.left_sensor = self.robot.getDistanceSensor('ls_left')
         self.left_sensor.enable(self.timestep)
-        
+
         self.sensorPublisher_right = self.create_publisher(Float64, 'right_IR', 10)
         self.sensorPublisher_mid = self.create_publisher(Float64, 'mid_IR', 10)
         self.sensorPublisher_left = self.create_publisher(Float64, 'left_IR', 10)
         self.get_logger().info('Sensor enabled')
 
+        # Wheels section
+        # |1 2|
+        # |3 4|
+        self.leftMotor_front = self.robot.getMotor('wheel1')
+        self.rightMotor_front = self.robot.getMotor('wheel2')
+        self.leftMotor_front.setPosition(float('inf'))
+        self.rightMotor_front.setPosition(float('inf'))
+        self.leftMotor_front.setVelocity(0)
+        self.rightMotor_front.setVelocity(0)
 
+        ####
+        self.leftMotor_rear = self.robot.getMotor('wheel3')
+        self.rightMotor_rear = self.robot.getMotor('wheel4')
+        self.leftMotor_rear.setPosition(float('inf'))
+        self.rightMotor_rear.setPosition(float('inf'))
+        self.leftMotor_rear.setVelocity(0)
+        self.rightMotor_rear.setVelocity(0)
+
+        self.motorMaxSpeed = self.leftMotor_rear.getMaxVelocity()
+
+        self.cmdVelSubscriber = self.create_subscription(Twist, 'cmd_vel',
+                                                         self.cmdVel_callback,
+                                                         10)
+
+    def cmdVel_callback(self, msg):
+        wheelGap = 0.1  # in meter
+        wheelRadius = 0.04  # in meter
+        leftSpeed = ((2.0 * msg.linear.x - msg.angular.z * wheelGap) /
+                    (2.0 * wheelRadius))
+        rightSpeed = ((2.0 * msg.linear.x + msg.angular.z * wheelGap) /
+                    (2.0 * wheelRadius))
+        leftSpeed = min(self.motorMaxSpeed, max(-self.motorMaxSpeed,
+                                                leftSpeed))
+        rightSpeed = min(self.motorMaxSpeed, max(-self.motorMaxSpeed,
+                                                rightSpeed))
+        self.leftMotor_front.setVelocity(leftSpeed)
+        self.rightMotor_front.setVelocity(rightSpeed)
+        self.leftMotor_rear.setVelocity(leftSpeed)
+        self.rightMotor_rear.setVelocity(rightSpeed)
 
     def sensor_callback(self):
         # Publish distance sensor value
