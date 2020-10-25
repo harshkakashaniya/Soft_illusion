@@ -1,7 +1,7 @@
 PROTO Robot_sense [
     field SFVec3f    translation  -0.143941 0.0198605 0.202666
     field SFRotation rotation     1.0911549263414444e-05 0.9999999999355068 3.1502938785775475e-06 2.349517532397045
-    field SFString   controller   "ros"
+    field SFString   controller   "<extern>"
   ]
   {
     Robot {
@@ -9,7 +9,8 @@ PROTO Robot_sense [
   rotation IS rotation
   controller IS controller
   children [
-    LightSensor {
+    DistanceSensor {
+      type "infra-red"
       translation -0.03 -0.02 0.1
       rotation 0 0 -1 1.5708
       children [
@@ -23,8 +24,13 @@ PROTO Robot_sense [
         }
       ]
       name "ls_right"
+      lookupTable [
+        0 1000 0
+        0.1 0 0
+      ]
     }
-    LightSensor {
+    DistanceSensor {
+      type "infra-red"
       translation -6.74634e-14 -0.02 0.1
       rotation 0 0 -1 1.5708
       children [
@@ -38,8 +44,13 @@ PROTO Robot_sense [
         }
       ]
       name "ls_mid"
+      lookupTable [
+        0 1000 0
+        0.1 0 0
+      ]
     }
-    LightSensor {
+    DistanceSensor {
+      type "infra-red"
       translation 0.03 -0.02 0.1
       rotation 0 0 -1 1.5708
       children [
@@ -53,6 +64,10 @@ PROTO Robot_sense [
         }
       ]
       name "ls_left"
+      lookupTable [
+        0 1000 0
+        0.1 0 0
+      ]
     }
     DEF Body Shape {
       appearance PBRAppearance {

@@ -14,10 +14,12 @@ data_files.append(('share/' + package_name, [
     'launch/robot_tools_launch.py',
     'launch/robot_with_tools_launch.py',
     'launch/rats_life_launch.py',
-    'launch/rats_life_waypoints_launch.py'
+    'launch/rats_life_waypoints_launch.py',
+    'launch/line_following_launch.py'
 ]))
 data_files.append(('share/' + package_name + '/worlds', [
     'worlds/epuck_world.wbt',
+    'worlds/epuck_with_custom.wbt',
     'worlds/.epuck_world.wbproj',
     'worlds/rats_life_benchmark.wbt',
     'worlds/.rats_life_benchmark.wbproj'
@@ -26,7 +28,9 @@ data_files.append(('share/' + package_name + '/protos', [
     'protos/E-puck_enu.proto',
     'protos/E-puckDistanceSensor_enu.proto',
     'protos/LegoTallInterval.proto',
-    'protos/LegoTallWall.proto'
+    'protos/LegoTallWall.proto',
+    'protos/Robot_sense.proto'
+
 ]))
 data_files.append(('share/' + package_name + '/protos/icons', glob('protos/icons/*')))
 data_files.append(('share/' + package_name + '/protos/textures', glob('protos/textures/*')))
@@ -71,7 +75,9 @@ setup(
             'drive_calibrator = webots_ros2_epuck.drive_calibrator:main',
             'simple_mapper = webots_ros2_epuck.simple_mapper:main',
             'publisher_vel = webots_ros2_epuck.publisher_vel:main',
-            'Sub_tof = webots_ros2_epuck.Sub_tof:main'
+            'Sub_tof = webots_ros2_epuck.Sub_tof:main',
+            'enable_sensor = webots_ros2_epuck.enable:main'
+
             
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']

@@ -1,0 +1,101 @@
+#VRML_SIM R2020b utf8
+WorldInfo {
+  info [
+    "Copyright (C) 2006 Laboratory of Intelligent Systems (LIS), EPFL"
+    "Thanks to jean-christophe.zufferey@epfl.ch"
+  ]
+  coordinateSystem "NUE"
+}
+Viewpoint {
+  orientation -0.22898965028937798 -0.8728575154134581 -0.43091008092941263 2.2729927721391974
+  position -2.2019668017674343 3.034659578825968 -1.7582991444450318
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 2 2
+  floorTileSize 2 2
+  floorAppearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "/home/koyal/ros2_ws/src/webots_ros2/webots_ros2_epuck/Loop_img.jpg"
+      ]
+    }
+    roughness 0.2
+    metalness 0
+  }
+  wallHeight 0.05
+}
+DEF OBSTACLE1 Solid {
+  translation 0.007158 0.025 0.207599
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.1 0.3
+        roughness 0.5
+        metalness 0
+      }
+      geometry DEF BOX1 Box {
+        size 0.05 0.05 0.05
+      }
+    }
+  ]
+  name "red box"
+  boundingObject USE BOX1
+}
+DEF OBSTACLE2 Solid {
+  translation -0.0203259 0.055 -0.482769
+  rotation 0 1 0 3.82203
+  scale 2 2 2
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 1
+        roughness 0.5
+        metalness 0
+      }
+      geometry DEF BOX2 Box {
+        size 0.08 0.05 0.08
+      }
+    }
+  ]
+  name "pink box"
+  boundingObject USE BOX2
+}
+DEF OBSTACLE3 Solid {
+  translation 0.550057 0.025 0.24285
+  rotation 0 1 0 13.7261
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.501961 0.501961 0.501961
+        roughness 0.5
+        metalness 0
+      }
+      geometry DEF BOX3 Box {
+        size 0.2 0.05 0.05
+      }
+    }
+  ]
+  name "gray box"
+  boundingObject USE BOX3
+}
+Robot_sense {
+  hidden position_0_0 24.6397780097228
+  hidden position_0_1 6.591807655528015
+  hidden position_0_2 24.6397781769018
+  hidden position_0_3 6.591807576559351
+  hidden linearVelocity_0 -1.502390648271557e-11 0 -1.222936679375931e-11
+  hidden angularVelocity_0 1.3802802243857257e-11 4.797925797103711e-09 -1.67745668282345e-11
+  hidden rotation_4 -0.2372178214715428 0.23702899373839148 0.9420960467508931 1.6296141060443177
+  hidden rotation_5 -0.15203380452305734 0.15191278411028894 -0.9766310604860494 4.689540972275863
+  hidden rotation_6 -0.23721774709443216 0.23702891942048557 0.942096084177086 1.6296140663865006
+  hidden rotation_7 -0.1520337668227763 0.15191274644001743 -0.976631072214441 4.689540984281758
+  translation -0.1529440009519352 0.03972096913963359 -0.17268499887145752
+  rotation 8.98540753661589e-06 0.9999999999505162 -4.269642345811063e-06 -2.254251268242757
+}
+E-puck_enu {
+  rotation 0.28108602380742503 -0.6785980574759006 -0.6785980574759006 -2.593565307179586
+}
