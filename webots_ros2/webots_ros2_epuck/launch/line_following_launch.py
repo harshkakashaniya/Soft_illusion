@@ -17,16 +17,18 @@ def generate_launch_description():
         ),
         launch_arguments=[
             ('package', 'webots_ros2_epuck'),
-            ('executable', 'enable_sensor'),
+            ('executable', 'enable_robot'),
             ('world', PathJoinSubstitution([package_dir, 'worlds', 'epuck_with_custom.wbt'])),
         ]
     )
     
+    Line_follower = Node(
+            package='webots_ros2_epuck',
+            executable='line_follower',
+            name='master_node'
+        )
+
     return LaunchDescription([
         webots,
-        Node(
-            package='webots_ros2_epuck',
-            executable='controller_custom_robot',
-            name='controller_custom_robot'
-        )
+        Line_follower
     ])

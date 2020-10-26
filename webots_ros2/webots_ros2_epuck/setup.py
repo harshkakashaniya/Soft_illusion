@@ -76,8 +76,8 @@ setup(
             'simple_mapper = webots_ros2_epuck.simple_mapper:main',
             'publisher_vel = webots_ros2_epuck.publisher_vel:main',
             'Sub_tof = webots_ros2_epuck.Sub_tof:main',
-            'enable_sensor = webots_ros2_epuck.enable:main',
-            'controller_custom_robot = webots_ros2_epuck.controller:main'
+            'enable_robot = webots_ros2_epuck.slave:main',
+            'line_follower = webots_ros2_epuck.master:main'
 
             
         ],
